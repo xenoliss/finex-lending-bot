@@ -1,0 +1,6 @@
+strategies:
+  - long_compound_usd:
+    currency: USD
+    min_amount: 150
+    monitored_timeframe: 1
+    max_period: 120

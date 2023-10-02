@@ -1,0 +1,15 @@
+[package]
+name = "finex-lending-bot"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bitfinex-api = { git = "https://github.com/xenoliss/bitfinex-api" }
+
+async-trait = "0.1.73"
+dotenv_codegen = "0.15.0"
+serde = { version = "1.0.188", features = ["derive"] }
+serde_yaml = "0.9.25"
+tokio = { version = "1.32.0", features = ["full"] }
