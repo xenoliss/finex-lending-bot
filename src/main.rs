@@ -1,20 +1,28 @@
-use dotenv_codegen::dotenv;
 use std::time::Duration;
 
-use bitfinex_api::bitfinex::AsyncBitfinex;
-
 mod strategies;
-use strategies::{basic_strategy::BasicStrategy, Strategy};
+use dotenv::dotenv;
+use strategies::{simple_strategy::SimpleStrategy, Strategy};
 
 #[tokio::main]
 async fn main() {
-    let api = AsyncBitfinex::new_auth(dotenv!("API_KEY"), dotenv!("SECRET_KEY"));
-    let basic_strategy = BasicStrategy::new(&api);
+    dotenv().ok();
 
-    let duration = Duration::from_secs(1);
+    env_logger::builder()
+        .filter_level(log::LevelFilter::Info)
+        .format_timestamp_secs()
+        .init();
+
+    let strategies = SimpleStrategy::from_config("./config.yaml");
+
     loop {
-        tokio::time::sleep(duration).await;
+        for strategy in &strategies {
+            let res = strategy.execute().await;
+            if let Err(e) = res {
+                log::error!("{e}")
+            }
+        }
 
-        basic_strategy.execute().await;
+        tokio::time::sleep(Duration::from_secs(60)).await;
     }
 }

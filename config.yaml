@@ -1,6 +1,9 @@
-strategies:
-  - long_compound_usd:
+simple_strategies:
+  short_term_usd:
+    keys: SHORT_TERM
     currency: USD
     min_amount: 150
-    monitored_timeframe: 1
-    max_period: 120
+    min_rate: 0.0005
+    target_period: 2
+    monitored_window: 24
+    nth_highest_candle: 3

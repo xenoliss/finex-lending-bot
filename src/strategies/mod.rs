@@ -1,14 +1,14 @@
 use async_trait::async_trait;
 
-pub mod basic_strategy;
+pub mod simple_strategy;
 
 #[async_trait]
 pub trait Strategy {
     type Output;
 
-    /// Get the strategy name.
-    fn name(&self) -> String;
+    fn from_config(path: &str) -> Vec<Self>
+    where
+        Self: std::marker::Sized;
 
-    /// Execute the strategy.
     async fn execute(&self) -> Self::Output;
 }

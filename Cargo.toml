@@ -9,7 +9,10 @@ edition = "2021"
 bitfinex-api = { git = "https://github.com/xenoliss/bitfinex-api" }
 
 async-trait = "0.1.73"
-dotenv_codegen = "0.15.0"
 serde = { version = "1.0.188", features = ["derive"] }
 serde_yaml = "0.9.25"
+anyhow = "1.0.75"
+env_logger = "0.10.0"
+log = "0.4.20"
 tokio = { version = "1.32.0", features = ["full"] }
+dotenv = "0.15.0"
