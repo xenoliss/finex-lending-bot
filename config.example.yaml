@@ -3,6 +3,7 @@ simple_strategies:
     keys: SHORT_TERM
     currency: USD
     min_amount: 150
+    max_balance_percent_per_loan: 0.2
     min_rate: 0.0005
     target_period: 2
     monitored_window: 24
@@ -11,6 +12,7 @@ simple_strategies:
     keys: LONG_TERM
     currency: USD
     min_amount: 150
+    max_balance_percent_per_loan: 0.2
     min_rate: 0.0005
     target_period: 120
     monitored_window: 24

@@ -35,6 +35,7 @@ pub struct SimpleStrategy {
     client: AsyncBitfinex,
     currency: String,
     min_amount: f64,
+    max_balance_percent_per_loan: f64,
     min_rate: f64,
     target_period: u8,
     monitored_window: u64,
@@ -48,6 +49,7 @@ impl SimpleStrategy {
         client: AsyncBitfinex,
         currency: String,
         min_amount: f64,
+        max_balance_percent_per_loan: f64,
         min_rate: f64,
         target_duration: u8,
         monitored_window: u64,
@@ -58,6 +60,7 @@ impl SimpleStrategy {
             client,
             currency,
             min_amount,
+            max_balance_percent_per_loan,
             min_rate,
             target_period: target_duration,
             monitored_window,
@@ -170,6 +173,7 @@ impl Strategy for SimpleStrategy {
             keys: String,
             currency: String,
             min_amount: f64,
+            max_balance_percent_per_loan: f64,
             min_rate: f64,
             target_period: u8,
             monitored_window: u64,
@@ -200,6 +204,7 @@ impl Strategy for SimpleStrategy {
                     ),
                     strategy.currency,
                     strategy.min_amount,
+                    strategy.max_balance_percent_per_loan,
                     strategy.min_rate,
                     strategy.target_period,
                     strategy.monitored_window,
@@ -248,7 +253,7 @@ impl Strategy for SimpleStrategy {
         // Clamp the amount to loan as a fraction of the total balance.
         let loan_amount = self
             .min_amount
-            .max(available_balance.min(total_balance * 0.1));
+            .max(available_balance.min(total_balance * self.max_balance_percent_per_loan));
 
         // Check if the active offer needs to be canceled.
         if let Some(active_offer) = active_offer {
