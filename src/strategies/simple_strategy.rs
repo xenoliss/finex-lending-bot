@@ -126,7 +126,7 @@ impl SimpleStrategy {
         // Get the candles over le last 24 hours.
         let mut candles: HistCandlesResp = Candles::builder()
             .candles(AvailableCandles::FundingCandles {
-                time_frame: TimeFrame::FiveMins,
+                time_frame: TimeFrame::FifteenMins,
                 currency: &format!("f{}", self.currency),
                 period,
             })
