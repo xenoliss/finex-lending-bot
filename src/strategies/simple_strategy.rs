@@ -227,11 +227,17 @@ impl Strategy for SimpleStrategy {
         // Early return if there is not enough available balance to create an offer.
         if available_balance < self.min_amount {
             log::info!(
-                "Insufficient balance to submit a lend offer: {available_balance} < {}",
+                "Insufficient balance to submit a lend offer: {available_balance:.2} < {:.2}",
                 self.min_amount
             );
             return Ok(());
         }
+
+        log::info!(
+            "{available_balance:.2} {} ({:.2}%) available and can be lended.",
+            self.currency,
+            available_balance * 100. / total_balance
+        );
 
         // Query the nth highest rate.
         let mut period = self.target_period;
@@ -261,9 +267,10 @@ impl Strategy for SimpleStrategy {
             let amount_diff = active_offer.amount - loan_amount;
 
             // Cancel the active offer if:
-            //  - its rate is too far from the current one
+            //  - its period is not the same as the current one
+            //  - or if its rate is too far from the current one
             //  - or if its loan amount if different from the current one
-            if rate_diff_percent > 0.01 || amount_diff > 1. {
+            if active_offer.period != period || rate_diff_percent > 0.01 || amount_diff > 1. {
                 ignore(
                     CancelFundingOffer::builder()
                         .id(active_offer.id)
@@ -274,8 +281,9 @@ impl Strategy for SimpleStrategy {
                 .await?;
             } else {
                 log::info!(
-                    "Active offer is good enough: {} @ {:.4}% per day ({:.2}% APR)",
+                    "Active offer is good enough: {:.2} for {} days @ {:.4}% per day ({:.2}% APR)",
                     active_offer.amount,
+                    active_offer.period,
                     active_offer.rate * 100.,
                     active_offer.rate * 100. * 365.
                 );
@@ -298,8 +306,9 @@ impl Strategy for SimpleStrategy {
         .await?;
 
         log::info!(
-            "Offer submitted: {} @ {:.4}% / day ({:.2}% APR)",
+            "Offer submitted: {:.2} for {} days @ {:.4}% per day ({:.2}% APR)",
             loan_amount,
+            period,
             rate * 100.,
             rate * 100. * 365.
         );
