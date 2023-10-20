@@ -264,13 +264,13 @@ impl Strategy for SimpleStrategy {
         // Check if the active offer needs to be canceled.
         if let Some(active_offer) = active_offer {
             let rate_diff_percent = (active_offer.rate - rate).abs() / rate;
-            let amount_diff = active_offer.amount - loan_amount;
+            let amount_diff = (loan_amount - active_offer.amount).abs();
 
             // Cancel the active offer if:
             //  - its period is not the same as the current one
+            //  - or if its loan amount is different from the current one
             //  - or if its rate is too far from the current one
-            //  - or if its loan amount if different from the current one
-            if active_offer.period != period || rate_diff_percent > 0.01 || amount_diff > 1. {
+            if active_offer.period != period || amount_diff > 1. || rate_diff_percent > 0.01 {
                 ignore(
                     CancelFundingOffer::builder()
                         .id(active_offer.id)
