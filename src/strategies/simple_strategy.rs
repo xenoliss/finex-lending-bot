@@ -71,8 +71,7 @@ impl SimpleStrategy {
     /// Fetch the funding wallet from Bitfinex API.
     async fn funding_wallet(&self) -> Result<WalletResp> {
         let wallets: WalletsResp = Wallets::builder()
-            .build()
-            .unwrap()
+            .build()?
             .query_async(&self.client)
             .await?;
 
@@ -88,8 +87,7 @@ impl SimpleStrategy {
     async fn active_offer(&self) -> Result<Option<FundingOffer>> {
         let mut active_offers: ActiveFundingOffersResp = ActiveFundingOffers::builder()
             .symbol(&format!("f{}", self.currency))
-            .build()
-            .unwrap()
+            .build()?
             .query_async(&self.client)
             .await?;
 
@@ -98,8 +96,7 @@ impl SimpleStrategy {
             ignore(
                 CancelAllFundingOffers::builder()
                     .currency(&self.currency)
-                    .build()
-                    .unwrap(),
+                    .build()?,
             )
             .query_async(&self.client)
             .await?;
@@ -116,10 +113,7 @@ impl SimpleStrategy {
 
     /// Fetch the nth highest candles from the Bitfinex API.
     async fn get_highest_rate(&self, nth_highest_candle: usize, period: u8) -> Result<f64> {
-        let now = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_millis();
+        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_millis();
 
         let start_mts = now - (self.monitored_window as u128 * 3600 * 1000);
 
@@ -133,8 +127,7 @@ impl SimpleStrategy {
             .section(Section::Hist)
             .sort(Sort::Asc)
             .start(start_mts as _)
-            .build()
-            .unwrap()
+            .build()?
             .query_async(&self.client)
             .await?;
 
@@ -271,14 +264,9 @@ impl Strategy for SimpleStrategy {
             //  - or if its loan amount is different from the current one
             //  - or if its rate is too far from the current one
             if active_offer.period != period || amount_diff > 1. || rate_diff_percent > 0.01 {
-                ignore(
-                    CancelFundingOffer::builder()
-                        .id(active_offer.id)
-                        .build()
-                        .unwrap(),
-                )
-                .query_async(&self.client)
-                .await?;
+                ignore(CancelFundingOffer::builder().id(active_offer.id).build()?)
+                    .query_async(&self.client)
+                    .await?;
             } else {
                 log::info!(
                     "Active offer is good enough: {:.2} for {} days @ {:.4}% per day ({:.2}% APR)",
@@ -299,8 +287,7 @@ impl Strategy for SimpleStrategy {
                 .rate(rate)
                 .period(period)
                 .hidden(true)
-                .build()
-                .unwrap(),
+                .build()?,
         )
         .query_async(&self.client)
         .await?;
